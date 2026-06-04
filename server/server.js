@@ -41,6 +41,12 @@ app.get("/products", async (req, res) => {
 
 app.post("/products", async (req, res) => {
   try {
+    const { name, price, shopName } = req.body;
+    if (!name || !price || !shopName) {
+      return res
+        .status(400)
+        .json({ message: "Name, price, and shop name are required" });
+    }
     const newProduct = await Product.create(req.body);
     res.status(201).json(newProduct);
   } catch (error) {
