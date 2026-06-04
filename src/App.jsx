@@ -16,14 +16,20 @@ const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:5000/products")
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        return response.json();
+      })
       .then((data) => {
         setProducts(data);
         setLoading(false);
       })
       .catch(() => {
-  setError("Unable to load products. Please try again.");
-  setLoading(false);
+        setError("Unable to load products. Please try again.");
+        setLoading(false);
       });
   }, []);
 
