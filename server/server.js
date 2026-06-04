@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const mongoose = require("mongoose");
 
 const Product = require("./Product");
@@ -11,7 +13,7 @@ const app = express();
 app.use(cors());
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/nearbynow")
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("Connected to MongoDB");
   })
