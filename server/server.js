@@ -12,6 +12,8 @@ const app = express();
 
 app.use(cors());
 
+app.use(express.json());
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -36,6 +38,17 @@ app.get("/products", async (req, res) => {
     res.status(500).json({ message: "Unable to load products" });
   }
 });
+
+app.post("/products", async (req, res) => {
+  try {
+    const newProduct = await Product.create(req.body);
+    res.status(201).json(newProduct);
+  } catch (error) {
+    console.log("Failed to create product", error);
+    res.status(500).json({ message: "Unable to create product" });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
