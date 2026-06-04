@@ -26,8 +26,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/products", async (req, res) => {
-  const products = await Product.find();
-  res.json(products);
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (error) {
+    console.log("Failed to fetch products", error);
+    res.status(500).json({ message: "Unable to load products" });
+  }
 });
 
 app.listen(PORT, () => {
