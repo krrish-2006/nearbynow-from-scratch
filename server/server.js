@@ -53,6 +53,24 @@ app.get("/products/:id", async (req, res) => {
 });
 
 
+app.put("/products/:id", async (req, res) => {
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true },
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.json(updatedProduct);
+  } catch (error) {
+    console.log("Failed to update product", error);
+    res.status(500).json({ message: "Unable to update product" });
+  }
+});
+
+
 app.post("/products", async (req, res) => {
   try {
     const { name, price, shopName } = req.body;
