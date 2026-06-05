@@ -71,6 +71,19 @@ app.put("/products/:id", async (req, res) => {
 });
 
 
+app.delete("/products/:id", async (req, res) => {
+  try {
+    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.log("Failed to delete product", error);
+    res.status(500).json({ message: "Unable to delete product" });
+  }
+});
+
 app.post("/products", async (req, res) => {
   try {
     const { name, price, shopName } = req.body;
