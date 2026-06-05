@@ -1,5 +1,9 @@
 .app-header {
   padding: 2rem clamp(1rem, 4vw, 3rem);
+  display: flex;
+justify-content: space-between;
+align-items: center;
+
 }
 
 .logo {
@@ -174,4 +178,50 @@ text-align: center;
   padding: 1rem;
   background-color: white;
 border-radius: 1rem;
+}
+
+.account-menu{
+    position: relative;
+    padding: 1rem;
+
+
+}
+.account-button{
+  padding: 15px;
+  border-radius: 1rem;
+  border: 2px solid grey;
+background: white;
+
+
+}
+
+.account-dropdown{
+  position: absolute;
+right: 0;
+top: 100%;
+width: 200px;
+background: white;
+border: 2px solid lightgray;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+border-radius: 1rem;
+z-index: 10;
+padding: 1rem;
+}
+
+.account-dropdown-title{
+font-weight: 700;
+  margin-bottom: 5px;
+    color: black;
+
+}
+
+.account-menu-item {
+  margin: 0;
+  padding: 0.6rem 0;
+  cursor: pointer;
+    color: black;
+
+}
+.account-menu-item:hover {
+  color: grey;
 }

@@ -13,6 +13,7 @@ function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 const [error, setError] = useState("");
+const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:5000/products")
@@ -50,12 +51,29 @@ const [error, setError] = useState("");
     setInterested(interested+1);
   }
 
+  function handleIsAccountMenuOpen(){
+    setIsAccountMenuOpen(!isAccountMenuOpen);
+  }
   return (
     <>
       {!selectedProduct && (
         <header className="app-header">
           <h1 className="logo">NearbyNow</h1>
-          <h2 className="interested-counter">Interested: {interested}</h2>
+          <div className="account-menu">
+            <button
+              onClick={handleIsAccountMenuOpen}
+              className="account-button"
+            >
+              Account
+            </button>
+            {isAccountMenuOpen && (
+              <div className="account-dropdown">
+                <p className="account-dropdown-title">Your Account</p>
+                <p className="account-menu-item">Profile</p>
+                <p className="account-menu-item">Wishlist</p>
+              </div>
+            )}
+          </div>
         </header>
       )}
       {!selectedProduct && (
