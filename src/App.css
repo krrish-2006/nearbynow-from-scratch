@@ -225,3 +225,13 @@ font-weight: 700;
 .account-menu-item:hover {
   color: grey;
 }
+
+.toast-message {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  background: black;
+  color: white;
+  padding: 0.8rem 1rem;
+  border-radius: 0.5rem;
+}

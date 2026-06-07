@@ -9,6 +9,14 @@ function ProductDetailsPage({ onAddToWishlist }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [showWishlistMessage, setShowWishlistMessage] = useState(false);
+  function handleAddToWishlist() {
+    onAddToWishlist(product);
+    setShowWishlistMessage(true);
+    setTimeout(() => {
+      setShowWishlistMessage(false);
+    }, 2000);
+  }
 
   useEffect(() => {
     fetch(`http://localhost:5000/products/${id}`)
@@ -33,12 +41,19 @@ function ProductDetailsPage({ onAddToWishlist }) {
   if (error) return <p>{error}</p>;
 
   return (
-    <ProductDetails
-      product={product}
-      onClose={() => navigate("/")}
-      onAddToWishlist={onAddToWishlist}
-    />
+    <>
+      <ProductDetails
+        product={product}
+        onClose={() => navigate("/")}
+        onAddToWishlist={handleAddToWishlist}
+      />
+
+      {showWishlistMessage && (
+        <div className="toast-message">Added to wishlist</div>
+      )}
+    </>
   );
 }
 
 export default ProductDetailsPage;
+
