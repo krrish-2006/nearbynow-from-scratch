@@ -1,19 +1,18 @@
 import "./App.css";
 import { useState, useEffect } from "react";
-import ProductDetails from "./ProductDetails"
-import SearchAndFilters from "./SearchAndFilters";
-import ProductList from "./ProductList";
-
+import HomePage from "./HomePage";
+import WishlistPage from "./WishlistPage";
+import { Routes, Route, Link } from "react-router-dom";
+import ProductDetailsPage from "./ProductDetailsPage";
 
 function App() {
   const [searchText, setSearchText] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
-  const [selectedProduct, setSelectedProduct] = useState(null);
-    const [interested, setInterested] = useState(0);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-const [error, setError] = useState("");
-const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [wishlistProducts, setWishlistProducts] = useState([]);
 
   useEffect(() => {
     fetch("http://localhost:5000/products")
@@ -34,7 +33,6 @@ const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
       });
   }, []);
 
-
   const normalizedSearchText = searchText.toLowerCase();
 
   const filteredProducts = products.filter((product) => {
@@ -47,60 +45,65 @@ const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
     return matchesSearch && matchesAvailability;
   });
 
-  function handleInterested(){
-    setInterested(interested+1);
-  }
+  function handleAddToWishlist(product) {
+    const alreadyExists = wishlistProducts.some(
+      (wishlistProduct) => wishlistProduct._id === product._id,
+    );
 
-  function handleIsAccountMenuOpen(){
+    if (!alreadyExists) {
+      setWishlistProducts([...wishlistProducts, product]);
+    }
+  }
+  function handleIsAccountMenuOpen() {
     setIsAccountMenuOpen(!isAccountMenuOpen);
   }
+
   return (
     <>
-      {!selectedProduct && (
-        <header className="app-header">
-          <h1 className="logo">NearbyNow</h1>
-          <div className="account-menu">
-            <button
-              onClick={handleIsAccountMenuOpen}
-              className="account-button"
-            >
-              Account
-            </button>
-            {isAccountMenuOpen && (
-              <div className="account-dropdown">
-                <p className="account-dropdown-title">Your Account</p>
-                <p className="account-menu-item">Profile</p>
-                <p className="account-menu-item">Wishlist</p>
-              </div>
-            )}
-          </div>
-        </header>
-      )}
-      {!selectedProduct && (
-        <SearchAndFilters
-          searchText={searchText}
-          setSearchText={setSearchText}
-          availabilityFilter={availabilityFilter}
-          setAvailabilityFilter={setAvailabilityFilter}
-        />
-      )}
+      <header className="app-header">
+        <h1 className="logo">NearbyNow</h1>
+        <div className="account-menu">
+          <button onClick={handleIsAccountMenuOpen} className="account-button">
+            Account
+          </button>
+          {isAccountMenuOpen && (
+            <div className="account-dropdown">
+              <p className="account-dropdown-title">Your Account</p>
+              <p className="account-menu-item">Profile</p>
+              <Link className="account-menu-item" to="/wishlist">
+                Wishlist
+              </Link>
+            </div>
+          )}
+        </div>
+      </header>
       <main>
-        {loading && <p>Loading products...</p>}
-        {error && <p>{error}</p>}
-        {selectedProduct && (
-          <ProductDetails
-            product={selectedProduct}
-            onClose={() => setSelectedProduct(null)}
-            onInterested={handleInterested}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomePage
+                filteredProducts={filteredProducts}
+                loading={loading}
+                error={error}
+                searchText={searchText}
+                setSearchText={setSearchText}
+                availabilityFilter={availabilityFilter}
+                setAvailabilityFilter={setAvailabilityFilter}
+              />
+            }
           />
-        )}
-
-        {!selectedProduct && !loading && !error && (
-          <ProductList
-            onSelectProduct={setSelectedProduct}
-            filteredProducts={filteredProducts}
+          <Route
+            path="/wishlist"
+            element={<WishlistPage wishlistProducts={wishlistProducts} />}
           />
-        )}
+          <Route
+            path="/products/:id"
+            element={
+              <ProductDetailsPage onAddToWishlist={handleAddToWishlist} />
+            }
+          />
+        </Routes>
       </main>
     </>
   );

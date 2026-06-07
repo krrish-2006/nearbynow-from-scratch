@@ -1,6 +1,6 @@
 import ProductCard from "./ProductCard";
 
-function ProductList({ onSelectProduct, filteredProducts }) {
+function ProductList({ filteredProducts }) {
   return (
     <section className="products-list">
       <h2 className="products-nearby">Products Nearby</h2>
@@ -10,9 +10,8 @@ function ProductList({ onSelectProduct, filteredProducts }) {
         ) : (
           filteredProducts.map((product) => (
             <ProductCard
-              key={product.id}
+              key={product._id}
               product={product}
-              onSelectProduct={onSelectProduct}
             />
           ))
         )}

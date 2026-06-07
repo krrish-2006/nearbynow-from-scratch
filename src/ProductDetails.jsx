@@ -1,7 +1,5 @@
 
-function ProductDetails({product, onClose, onInterested}){
-
-
+function ProductDetails({ product, onClose, onAddToWishlist }) {
   return (
     <section className="product-details">
       <button className="details-back-button" onClick={() => onClose()}>
@@ -26,7 +24,9 @@ function ProductDetails({product, onClose, onInterested}){
       >
         Open in Google Maps
       </a>
-      <button onClick={onInterested} className="interested-button">Interested</button>
+      <button onClick={() => onAddToWishlist(product)} className="interested-button">
+        Add to Wishlist
+      </button>
     </section>
   );
 }
