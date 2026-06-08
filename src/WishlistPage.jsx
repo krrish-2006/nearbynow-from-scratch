@@ -1,6 +1,6 @@
 import ProductCard from "./ProductCard";
 
-function WishlistPage({ wishlistProducts }) {
+function WishlistPage({ wishlistProducts, onRemoveFromWishlist }) {
   if (wishlistProducts.length === 0) {
     return <p>Your wishlist is empty</p>;
   }
@@ -11,7 +11,12 @@ function WishlistPage({ wishlistProducts }) {
 
       <div className="products-grid">
         {wishlistProducts.map((product) => (
-          <ProductCard key={product._id} product={product} />
+          <div key={product._id}>
+            <ProductCard product={product} />
+            <button onClick={() => onRemoveFromWishlist(product._id)}>
+              Remove
+            </button>
+          </div>
         ))}
       </div>
     </section>

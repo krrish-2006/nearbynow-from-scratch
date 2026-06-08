@@ -54,6 +54,15 @@ function App() {
       setWishlistProducts([...wishlistProducts, product]);
     }
   }
+
+  function handleRemoveFromWishlist(productId) {
+    const updatedWishlist = wishlistProducts.filter(
+      (product) => product._id !== productId,
+    );
+
+    setWishlistProducts(updatedWishlist);
+  }
+
   function handleIsAccountMenuOpen() {
     setIsAccountMenuOpen(!isAccountMenuOpen);
   }
@@ -95,7 +104,12 @@ function App() {
           />
           <Route
             path="/wishlist"
-            element={<WishlistPage wishlistProducts={wishlistProducts} />}
+            element={
+              <WishlistPage
+                wishlistProducts={wishlistProducts}
+                onRemoveFromWishlist={handleRemoveFromWishlist}
+              />
+            }
           />
           <Route
             path="/products/:id"
@@ -107,7 +121,7 @@ function App() {
       </main>
     </>
   );
-  
+
 }
 
 export default App;
