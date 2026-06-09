@@ -33,6 +33,23 @@ function App() {
       });
   }, []);
 
+  useEffect(() => {
+    fetch("http://localhost:5000/wishlist")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch wishlist");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        setWishlistProducts(data);
+      })
+      .catch((error) => {
+        console.log("Unable to load wishlist", error);
+      });
+  }, []);
+
   const normalizedSearchText = searchText.toLowerCase();
 
   const filteredProducts = products.filter((product) => {
@@ -45,24 +62,40 @@ function App() {
     return matchesSearch && matchesAvailability;
   });
 
-  function handleAddToWishlist(product) {
-    const alreadyExists = wishlistProducts.some(
-      (wishlistProduct) => wishlistProduct._id === product._id,
-    );
+  async function handleAddToWishlist(product) {
+    const response = await fetch("http://localhost:5000/wishlist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId: product._id,
+      }),
+    });
 
-    if (!alreadyExists) {
-      setWishlistProducts([...wishlistProducts, product]);
+    if (!response.ok) {
+      throw new Error("Unable to add product to wishlist");
     }
+
+    setWishlistProducts([...wishlistProducts, product]);
   }
 
-  function handleRemoveFromWishlist(productId) {
-    const updatedWishlist = wishlistProducts.filter(
-      (product) => product._id !== productId,
+  async function handleRemoveFromWishlist(productId) {
+    const response = await fetch(
+      `http://localhost:5000/wishlist/${productId}`,
+      {
+        method: "DELETE",
+      },
     );
 
-    setWishlistProducts(updatedWishlist);
-  }
+    if (!response.ok) {
+      throw new Error("Unable to remove product from wishlist");
+    }
 
+    setWishlistProducts((currentWishlist) =>
+      currentWishlist.filter((product) => product._id !== productId),
+    );
+  }
   function handleIsAccountMenuOpen() {
     setIsAccountMenuOpen(!isAccountMenuOpen);
   }
@@ -121,7 +154,6 @@ function App() {
       </main>
     </>
   );
-
 }
 
 export default App;

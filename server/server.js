@@ -3,7 +3,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 
 const Product = require("./Product");
-
+const WishlistItem = require("./WishlistItem");
 const cors = require("cors");
 
 const express = require("express");
@@ -13,6 +13,7 @@ const app = express();
 app.use(cors());
 
 app.use(express.json());
+
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -100,6 +101,51 @@ app.post("/products", async (req, res) => {
   }
 });
 
+app.get("/wishlist", async (req, res) => {
+  try {
+    const wishlistItems = await WishlistItem.find().populate("productId");
+
+    const products = wishlistItems.map((item) => item.productId);
+
+    res.json(products);
+  } catch (error) {
+    console.log("Failed to fetch wishlist", error);
+    res.status(500).json({ message: "Unable to load wishlist" });
+  }
+});
+
+app.post("/wishlist", async (req, res) => {
+  try {
+    const { productId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    const wishlistItem = await WishlistItem.create({ productId });
+
+    res.status(201).json(wishlistItem);
+  } catch (error) {
+    console.log("Failed to add wishlist item", error);
+    res.status(500).json({ message: "Unable to add wishlist item" });
+  }
+});
+
+app.delete("/wishlist/:productId", async (req, res) => {
+  try {
+    const deletedItem = await WishlistItem.findOneAndDelete({
+      productId: req.params.productId,
+    });
+
+    if (!deletedItem) {
+      return res.status(404).json({ message: "Wishlist item not found" });
+    }
+
+    res.json({ message: "Wishlist item removed" });
+  } catch (error) {
+    console.log("Failed to remove wishlist item", error);
+    res.status(500).json({ message: "Unable to remove wishlist item" });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
