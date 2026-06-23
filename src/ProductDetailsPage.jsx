@@ -1,7 +1,6 @@
-import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ProductDetails from "./ProductDetails";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 function ProductDetailsPage({ onAddToWishlist }) {
   const { id } = useParams();

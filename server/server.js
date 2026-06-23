@@ -1,19 +1,24 @@
 require("dotenv").config();
+const productRoutes = require("./routes/products");
+const wishlistRoutes = require("./routes/wishlist");
+const authRoutes = require("./routes/auth");
+
 
 const mongoose = require("mongoose");
 
-const Product = require("./Product");
-const WishlistItem = require("./WishlistItem");
 const cors = require("cors");
 
 const express = require("express");
 
 const app = express();
 
+
 app.use(cors());
 
 app.use(express.json());
-
+app.use("/products", productRoutes);
+app.use("/wishlist", wishlistRoutes);
+app.use("/auth", authRoutes);
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -28,123 +33,6 @@ const PORT = 5000;
 
 app.get("/", (req, res) => {
   res.send("NearbyNow backend is running");
-});
-
-app.get("/products", async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (error) {
-    console.log("Failed to fetch products", error);
-    res.status(500).json({ message: "Unable to load products" });
-  }
-});
-
-app.get("/products/:id", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: "Product doesn't exist" });
-    }
-    res.json(product);
-  } catch (error) {
-    console.log("Failed to fetch product", error);
-    res.status(500).json({ message: "Unable to load product" });
-  }
-});
-
-
-app.put("/products/:id", async (req, res) => {
-  try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true },
-    );
-    if (!updatedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-    res.json(updatedProduct);
-  } catch (error) {
-    console.log("Failed to update product", error);
-    res.status(500).json({ message: "Unable to update product" });
-  }
-});
-
-
-app.delete("/products/:id", async (req, res) => {
-  try {
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    if (!deletedProduct) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-    res.json({ message: "Product deleted successfully" });
-  } catch (error) {
-    console.log("Failed to delete product", error);
-    res.status(500).json({ message: "Unable to delete product" });
-  }
-});
-
-app.post("/products", async (req, res) => {
-  try {
-    const { name, price, shopName } = req.body;
-    if (!name || !price || !shopName) {
-      return res
-        .status(400)
-        .json({ message: "Name, price, and shop name are required" });
-    }
-    const newProduct = await Product.create(req.body);
-    res.status(201).json(newProduct);
-  } catch (error) {
-    console.log("Failed to create product", error);
-    res.status(500).json({ message: "Unable to create product" });
-  }
-});
-
-app.get("/wishlist", async (req, res) => {
-  try {
-    const wishlistItems = await WishlistItem.find().populate("productId");
-
-    const products = wishlistItems.map((item) => item.productId);
-
-    res.json(products);
-  } catch (error) {
-    console.log("Failed to fetch wishlist", error);
-    res.status(500).json({ message: "Unable to load wishlist" });
-  }
-});
-
-app.post("/wishlist", async (req, res) => {
-  try {
-    const { productId } = req.body;
-    if (!productId) {
-      return res.status(400).json({ message: "Product ID is required" });
-    }
-
-    const wishlistItem = await WishlistItem.create({ productId });
-
-    res.status(201).json(wishlistItem);
-  } catch (error) {
-    console.log("Failed to add wishlist item", error);
-    res.status(500).json({ message: "Unable to add wishlist item" });
-  }
-});
-
-app.delete("/wishlist/:productId", async (req, res) => {
-  try {
-    const deletedItem = await WishlistItem.findOneAndDelete({
-      productId: req.params.productId,
-    });
-
-    if (!deletedItem) {
-      return res.status(404).json({ message: "Wishlist item not found" });
-    }
-
-    res.json({ message: "Wishlist item removed" });
-  } catch (error) {
-    console.log("Failed to remove wishlist item", error);
-    res.status(500).json({ message: "Unable to remove wishlist item" });
-  }
 });
 
 app.listen(PORT, () => {

@@ -5,7 +5,7 @@ function ProductDetails({ product, onClose, onAddToWishlist }) {
       <button className="details-back-button" onClick={() => onClose()}>
         Back
       </button>
-      <img className="details-image" src={product.image} alt="Happy tshirt" />
+      <img className="details-image" src={product.image} alt={product.name} />
       <p className="details-shopname">{product.shopName}</p>
       <p className="details-name">{product.name}</p>
       <p className="details-price">{product.price}</p>
@@ -24,7 +24,10 @@ function ProductDetails({ product, onClose, onAddToWishlist }) {
       >
         Open in Google Maps
       </a>
-      <button onClick={() => onAddToWishlist(product)} className="interested-button">
+      <button
+        onClick={() => onAddToWishlist(product)}
+        className="interested-button"
+      >
         Add to Wishlist
       </button>
     </section>

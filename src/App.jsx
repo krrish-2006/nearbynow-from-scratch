@@ -4,6 +4,9 @@ import HomePage from "./HomePage";
 import WishlistPage from "./WishlistPage";
 import { Routes, Route, Link } from "react-router-dom";
 import ProductDetailsPage from "./ProductDetailsPage";
+import GoogleLoginButton from "./GoogleLoginButton";
+import { Navigate } from "react-router-dom";
+import ProfilePage from "./ProfilePage";
 
 function App() {
   const [searchText, setSearchText] = useState("");
@@ -13,6 +16,7 @@ function App() {
   const [error, setError] = useState("");
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [wishlistProducts, setWishlistProducts] = useState([]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:5000/products")
@@ -34,7 +38,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:5000/wishlist")
+    if (!user) return;
+    fetch(`http://localhost:5000/wishlist/${user._id}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch wishlist");
@@ -48,7 +53,7 @@ function App() {
       .catch((error) => {
         console.log("Unable to load wishlist", error);
       });
-  }, []);
+  }, [user]);
 
   const normalizedSearchText = searchText.toLowerCase();
 
@@ -62,6 +67,14 @@ function App() {
     return matchesSearch && matchesAvailability;
   });
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      setUser(user);
+    }
+  }, []);
+
   async function handleAddToWishlist(product) {
     const response = await fetch("http://localhost:5000/wishlist", {
       method: "POST",
@@ -70,6 +83,7 @@ function App() {
       },
       body: JSON.stringify({
         productId: product._id,
+        userId:user._id,
       }),
     });
 
@@ -82,7 +96,7 @@ function App() {
 
   async function handleRemoveFromWishlist(productId) {
     const response = await fetch(
-      `http://localhost:5000/wishlist/${productId}`,
+      `http://localhost:5000/wishlist/${productId}/${user._id}`,
       {
         method: "DELETE",
       },
@@ -96,6 +110,7 @@ function App() {
       currentWishlist.filter((product) => product._id !== productId),
     );
   }
+
   function handleIsAccountMenuOpen() {
     setIsAccountMenuOpen(!isAccountMenuOpen);
   }
@@ -108,13 +123,25 @@ function App() {
           <button onClick={handleIsAccountMenuOpen} className="account-button">
             Account
           </button>
+          <p>{user?.name}</p>
           {isAccountMenuOpen && (
             <div className="account-dropdown">
               <p className="account-dropdown-title">Your Account</p>
-              <p className="account-menu-item">Profile</p>
+              <Link className="account-menu-item" to="/profile">
+                Profile
+              </Link>
+              
               <Link className="account-menu-item" to="/wishlist">
                 Wishlist
               </Link>
+              <button
+                onClick={() => {
+                  setUser(null);
+                  localStorage.removeItem("user");
+                }}
+              >
+                Logout
+              </button>
             </div>
           )}
         </div>
@@ -124,30 +151,58 @@ function App() {
           <Route
             path="/"
             element={
-              <HomePage
-                filteredProducts={filteredProducts}
-                loading={loading}
-                error={error}
-                searchText={searchText}
-                setSearchText={setSearchText}
-                availabilityFilter={availabilityFilter}
-                setAvailabilityFilter={setAvailabilityFilter}
-              />
+              user ? (
+                <HomePage
+                  filteredProducts={filteredProducts}
+                  loading={loading}
+                  error={error}
+                  searchText={searchText}
+                  setSearchText={setSearchText}
+                  availabilityFilter={availabilityFilter}
+                  setAvailabilityFilter={setAvailabilityFilter}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/wishlist"
             element={
-              <WishlistPage
-                wishlistProducts={wishlistProducts}
-                onRemoveFromWishlist={handleRemoveFromWishlist}
-              />
+              user ? (
+                <WishlistPage
+                  wishlistProducts={wishlistProducts}
+                  onRemoveFromWishlist={handleRemoveFromWishlist}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/products/:id"
             element={
-              <ProductDetailsPage onAddToWishlist={handleAddToWishlist} />
+              user ? (
+                <ProductDetailsPage onAddToWishlist={handleAddToWishlist} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              user ? (
+                <Navigate to="/" />
+              ) : (
+                <GoogleLoginButton onLoginSuccess={setUser} />
+              )
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              user ? <ProfilePage user={user} /> : <Navigate to="/login" />
             }
           />
         </Routes>
