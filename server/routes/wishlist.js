@@ -4,10 +4,12 @@ const WishlistItem = require("../WishlistItem");
 
 const router = express.Router();
 
-router.get("/:userId", async (req, res) => {
+const authMiddleware = require("../middleware/auth");
+
+router.get("/", authMiddleware, async (req, res) => {
   try {
     const wishlistItems = await WishlistItem.find({
-      userId: req.params.userId,
+      userId: req.userId,
     }).populate("productId");
 
     const products = wishlistItems.map((item) => item.productId);
@@ -19,9 +21,11 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   try {
-    const { productId, userId } = req.body;
+const { productId } = req.body;
+
+const userId = req.userId;
     if (!productId) {
       return res.status(400).json({ message: "Product ID is required" });
     }
@@ -46,11 +50,11 @@ router.post("/", async (req, res) => {
 });
 
 
-router.delete("/:productId/:userId", async (req, res) => {
+router.delete("/:productId", authMiddleware, async (req, res) => {
   try {
     const deletedItem = await WishlistItem.findOneAndDelete({
       productId: req.params.productId,
-      userId: req.params.userId,
+      userId: req.userId,
     });
 
     if (!deletedItem) {

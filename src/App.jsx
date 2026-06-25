@@ -39,20 +39,24 @@ function App() {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`http://localhost:5000/wishlist/${user._id}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch wishlist");
-        }
+fetch("http://localhost:5000/wishlist", {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+})
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Failed to fetch wishlist");
+    }
 
-        return response.json();
-      })
-      .then((data) => {
-        setWishlistProducts(data);
-      })
-      .catch((error) => {
-        console.log("Unable to load wishlist", error);
-      });
+    return response.json();
+  })
+  .then((data) => {
+    setWishlistProducts(data);
+  })
+  .catch((error) => {
+    console.log("Unable to load wishlist", error);
+  });
   }, [user]);
 
   const normalizedSearchText = searchText.toLowerCase();
@@ -75,15 +79,15 @@ function App() {
     }
   }, []);
 
-  async function handleAddToWishlist(product) {
+    async function handleAddToWishlist(product) {
     const response = await fetch("http://localhost:5000/wishlist", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json",
+  Authorization: `Bearer ${localStorage.getItem("token")}`,
+},
       body: JSON.stringify({
         productId: product._id,
-        userId:user._id,
+        
       }),
     });
 
@@ -94,14 +98,15 @@ function App() {
     setWishlistProducts([...wishlistProducts, product]);
   }
 
-  async function handleRemoveFromWishlist(productId) {
-    const response = await fetch(
-      `http://localhost:5000/wishlist/${productId}/${user._id}`,
-      {
-        method: "DELETE",
-      },
-    );
 
+
+  async function handleRemoveFromWishlist(productId) {
+const response = await fetch(`http://localhost:5000/wishlist/${productId}`, {
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("token")}`,
+  },
+});
     if (!response.ok) {
       throw new Error("Unable to remove product from wishlist");
     }
@@ -138,6 +143,7 @@ function App() {
                 onClick={() => {
                   setUser(null);
                   localStorage.removeItem("user");
+                    localStorage.removeItem("token");
                 }}
               >
                 Logout

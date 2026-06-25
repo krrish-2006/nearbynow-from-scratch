@@ -15,12 +15,15 @@ function GoogleLoginButton({ onLoginSuccess }) {
             credential: credentialResponse.credential,
           }),
         });
-
         const data = await response.json();
-        onLoginSuccess(data);
-        localStorage.setItem("user", JSON.stringify(data));
-        navigate("/");
 
+        onLoginSuccess(data.user);
+
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        localStorage.setItem("token", data.token);
+
+        navigate("/");
       }}
       onError={() => {
         console.log("Google login failed");
