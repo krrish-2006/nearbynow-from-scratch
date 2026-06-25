@@ -6,7 +6,9 @@ function GoogleLoginButton({ onLoginSuccess }) {
   return (
     <GoogleLogin
       onSuccess={async (credentialResponse) => {
-        const response = await fetch("http://localhost:5000/auth/google", {
+const response = await fetch(
+  `${import.meta.env.VITE_API_URL}/auth/google`,
+  {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

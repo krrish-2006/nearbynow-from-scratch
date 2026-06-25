@@ -19,27 +19,27 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/products")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
+fetch(`${import.meta.env.VITE_API_URL}/products`)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Failed to fetch products");
+    }
 
-        return response.json();
-      })
-      .then((data) => {
-        setProducts(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Unable to load products. Please try again.");
-        setLoading(false);
-      });
+    return response.json();
+  })
+  .then((data) => {
+    setProducts(data);
+    setLoading(false);
+  })
+  .catch(() => {
+    setError("Unable to load products. Please try again.");
+    setLoading(false);
+  });
   }, []);
 
   useEffect(() => {
     if (!user) return;
-fetch("http://localhost:5000/wishlist", {
+fetch(`${import.meta.env.VITE_API_URL}/wishlist`, {
   headers: {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   },
@@ -80,7 +80,7 @@ fetch("http://localhost:5000/wishlist", {
   }, []);
 
     async function handleAddToWishlist(product) {
-    const response = await fetch("http://localhost:5000/wishlist", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/wishlist`, {
       method: "POST",
       headers: {"Content-Type": "application/json",
   Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -101,12 +101,15 @@ fetch("http://localhost:5000/wishlist", {
 
 
   async function handleRemoveFromWishlist(productId) {
-const response = await fetch(`http://localhost:5000/wishlist/${productId}`, {
-  method: "DELETE",
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
+const response = await fetch(
+  `${import.meta.env.VITE_API_URL}/wishlist/${productId}`,
+  {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
   },
-});
+);
     if (!response.ok) {
       throw new Error("Unable to remove product from wishlist");
     }
