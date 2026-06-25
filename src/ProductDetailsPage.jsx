@@ -18,22 +18,22 @@ function ProductDetailsPage({ onAddToWishlist }) {
   }
 
   useEffect(() => {
-    fetch(`http://localhost:5000/products/${id}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch product");
-        }
+fetch(`${import.meta.env.VITE_API_URL}/products/${id}`)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Failed to fetch product");
+    }
 
-        return response.json();
-      })
-      .then((data) => {
-        setProduct(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Unable to load product.");
-        setLoading(false);
-      });
+    return response.json();
+  })
+  .then((data) => {
+    setProduct(data);
+    setLoading(false);
+  })
+  .catch(() => {
+    setError("Unable to load product.");
+    setLoading(false);
+  });
   }, [id]);
 
   if (loading) return <p>Loading product...</p>;
